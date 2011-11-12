@@ -30,6 +30,12 @@ context "Resque::Scheduler" do
     Resque::Scheduler.enqueue_from_config(config)
   end
 
+  test "enqueue uses the provided queue name" do
+    config = {'class' => 'SomeRealClass', 'queue' => 'high_queue', 'args' => "/tmp"}
+    Resque.expects(:enqueue_to).with('high_queue', SomeRealClass, "/tmp")
+    Resque::Scheduler.enqueue_from_config(config)
+  end
+
   test "config makes it into the rufus_scheduler" do
     assert_equal(0, Resque::Scheduler.rufus_scheduler.all_jobs.size)
 

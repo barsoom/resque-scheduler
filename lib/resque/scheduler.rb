@@ -202,7 +202,13 @@ module Resque
           # for non-existent classes (for example: running scheduler in
           # one app that schedules for another
           if Class === klass
-            Resque.enqueue(klass, *params)
+            # This hasn't been released as a new resque gem version yet so we can't depend on it.
+            # https://github.com/defunkt/resque/commit/f2a1e12de1a0e56178dcec5510fe870ff1248aa6
+            if Resque.respond_to?(:enqueue_to)
+              Resque.enqueue_to(queue, klass, *params)
+            else
+              Resque.enqueue(klass, *params)
+            end
           else
             # This will not run the before_hooks in rescue, but will at least
             # queue the job.
